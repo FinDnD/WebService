@@ -41,6 +41,7 @@ namespace Espresso401_WebService.Controllers
                 await image.CopyToAsync(stream);
             }
 
+
             string imageUrl = await _image.UploadImage($"{user.UserName}CurrentImage", path, userId);
             return imageUrl;
         }
