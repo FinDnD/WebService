@@ -17,13 +17,11 @@ namespace Espresso401_WebService.Controllers
     [ApiController]
     public class UserImagesController : ControllerBase
     {
-        private IConfiguration _config;
         private IImage _image;
         private UserManager<ApplicationUser> _userManager;
 
-        public UserImagesController(IConfiguration config, UserManager<ApplicationUser> userManager, IImage image)
+        public UserImagesController(UserManager<ApplicationUser> userManager, IImage image)
         {
-            _config = config;
             _image = image;
             _userManager = userManager;
         }

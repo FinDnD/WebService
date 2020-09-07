@@ -88,10 +88,10 @@ namespace Espresso401_WebServiceTests
             #endregion DataSeeding
 
             var repo = BuildDb();
-            Request req1 = await repo.CreateRequest(newPlayer.Id, newDm.Id);
-            Request req2 = await repo.CreateRequest(newPlayer.Id, newDm2.Id);
-            Request req3 = await repo.CreateRequest(newPlayer2.Id, newDm.Id);
-            Request req4 = await repo.CreateRequest(newPlayer2.Id, newDm2.Id);
+            RequestDTO req1 = await repo.CreateRequest(newPlayer.Id, newDm.Id);
+            RequestDTO req2 = await repo.CreateRequest(newPlayer.Id, newDm2.Id);
+            RequestDTO req3 = await repo.CreateRequest(newPlayer2.Id, newDm.Id);
+            RequestDTO req4 = await repo.CreateRequest(newPlayer2.Id, newDm2.Id);
 
             var result = await repo.GetAllUserRequests(newPlayer.UserId);
 
@@ -155,10 +155,10 @@ namespace Espresso401_WebServiceTests
             #endregion DataSeeding
 
             var repo = BuildDb();
-            Request req1 = await repo.CreateRequest(newPlayer.Id, newDm.Id);
-            Request req2 = await repo.CreateRequest(newPlayer.Id, newDm2.Id);
-            Request req3 = await repo.CreateRequest(newPlayer2.Id, newDm.Id);
-            Request req4 = await repo.CreateRequest(newPlayer2.Id, newDm2.Id);
+            RequestDTO req1 = await repo.CreateRequest(newPlayer.Id, newDm.Id);
+            RequestDTO req2 = await repo.CreateRequest(newPlayer.Id, newDm2.Id);
+            RequestDTO req3 = await repo.CreateRequest(newPlayer2.Id, newDm.Id);
+            RequestDTO req4 = await repo.CreateRequest(newPlayer2.Id, newDm2.Id);
 
             await repo.DeactivateRequest(req1.Id);
 
@@ -286,12 +286,12 @@ namespace Espresso401_WebServiceTests
             #endregion DataSeeding
 
             var repo = BuildDb();
-            Request req1 = await repo.CreateRequest(newPlayer.Id, newDm.Id);
-            Request req2 = await repo.CreateRequest(newPlayer.Id, newDm2.Id);
-            Request req3 = await repo.CreateRequest(newPlayer2.Id, newDm.Id);
-            Request req4 = await repo.CreateRequest(newPlayer2.Id, newDm2.Id);
+            RequestDTO req1 = await repo.CreateRequest(newPlayer.Id, newDm.Id);
+            RequestDTO req2 = await repo.CreateRequest(newPlayer.Id, newDm2.Id);
+            RequestDTO req3 = await repo.CreateRequest(newPlayer2.Id, newDm.Id);
+            RequestDTO req4 = await repo.CreateRequest(newPlayer2.Id, newDm2.Id);
 
-            // Requests get created when Players/DMs so there's actually two in DB when I force a 2nd above, this is not a production situation, in Production they are only ever created when Profiles are Created and Deleted when either Profile in the Request is.
+            // Requests get created when Players/DMs so there's actually two in DB when I force a 2nd above, this is not a production situation, in Production they are only ever created when Profiles are Created and Deleted when either Profile in the RequestDTO is.
             await repo.DeleteRequest(newPlayer.Id, newDm.Id);
             await repo.DeleteRequest(newPlayer.Id, newDm.Id);
 
@@ -306,7 +306,7 @@ namespace Espresso401_WebServiceTests
         {
             var repo = BuildDb();
             // Starts Active by default
-            Request newReq = await repo.CreateRequest(1, 1);
+            RequestDTO newReq = await repo.CreateRequest(1, 1);
 
             Assert.True(newReq.Active);
 
@@ -319,8 +319,8 @@ namespace Espresso401_WebServiceTests
         //public async Task CanUpdateRequest()
         //{
         //    var repo = BuildDb();
-        //    Request newReq = await repo.CreateRequest(1, 1);
-        //    Request updatedReq = new Request()
+        //    RequestDTO newReq = await repo.CreateRequest(1, 1);
+        //    RequestDTO updatedReq = new RequestDTO()
         //    {
         //        Id = newReq.Id,
         //        DungeonMasterId = 1,

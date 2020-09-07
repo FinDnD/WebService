@@ -15,6 +15,6 @@ namespace Espresso401_WebService.Models.DTOs
         public int LawAlignment { get; set; }
         public int? PartyId { get; set; }
         public PartyDTO Party { get; set; }
-        public List<Request> ActiveRequests { get; set; }
+        public List<RequestDTO> ActiveRequests { get; set; }
     }
 }

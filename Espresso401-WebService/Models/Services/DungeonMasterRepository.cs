@@ -148,7 +148,7 @@ namespace Espresso401_WebService.Models.Services
                 ExperienceLevel = dungeonMaster.ExperienceLevel.ToString(),
                 PersonalBio = dungeonMaster.PersonalBio,
                 Party = await _party.GetPartyByDMId(dungeonMaster.Id),
-                ActiveRequests = await _context.Requests.Where(x => x.DungeonMasterId == dungeonMaster.Id && x.Active && !x.DungeonMasterAccepted).ToListAsync()
+                ActiveRequests = await _request.GetAllActiveUserRequests(dungeonMaster.UserId)
             };
             return result;
         }

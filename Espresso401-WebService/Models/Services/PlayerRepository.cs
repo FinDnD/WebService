@@ -40,14 +40,14 @@ namespace Espresso401_WebService.Models.Services
             player.PartyId = 1;
             _context.Entry(player).State = EntityState.Added;
             await _context.SaveChangesAsync();
-            playerDTO.ActiveRequests = new List<Request>();
+            playerDTO.ActiveRequests = new List<RequestDTO>();
             // TODO: Only get DMs with a party that isn't already full
             var dms = await _context.DungeonMasters.ToListAsync();
             if (dms != null)
             {
                 foreach (var dm in dms)
                 {
-                    Request newReq = await _request.CreateRequest(player.Id, dm.Id);
+                    RequestDTO newReq = await _request.CreateRequest(player.Id, dm.Id);
                     playerDTO.ActiveRequests.Add(newReq);
                 }
             }

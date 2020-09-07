@@ -1,4 +1,5 @@
 ﻿using Espresso401_WebService.Models;
+using Espresso401_WebService.Models.DTOs;
 using Espresso401_WebService.Models.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ namespace Espresso401_WebService.Controllers
 
         // PUT api/Swipes/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, Request request)
+        public async Task<IActionResult> Put(int id, RequestDTO request)
         {
             if (id != request.Id)
             {

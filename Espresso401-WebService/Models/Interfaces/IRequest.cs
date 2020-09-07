@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Espresso401_WebService.Models.DTOs;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Espresso401_WebService.Models.Interfaces
@@ -11,28 +12,28 @@ namespace Espresso401_WebService.Models.Interfaces
         /// <param name="playerId">Player ID</param>
         /// <param name="dmId">Dungeon Master ID</param>
         /// <returns>Newly created Request</returns>
-        Task<Request> CreateRequest(int playerId, int dmId);
+        Task<RequestDTO> CreateRequest(int playerId, int dmId);
 
         /// <summary>
         /// Get all of the requests associated with a given User ID
         /// </summary>
         /// <param name="userId">User ID to be searched</param>
         /// <returns>List of all Requests for a given user (Active and Inactive)</returns>
-        Task<List<Request>> GetAllUserRequests(string userId);
+        Task<List<RequestDTO>> GetAllUserRequests(string userId);
 
         /// <summary>
         /// Get all of the requests associated with a given User ID that are active and have not already been "Swiped right" by user and are Active
         /// </summary>
         /// <param name="userId">User ID to be searched</param>
         /// <returns>List of Active Requests for user</returns>
-        Task<List<Request>> GetAllActiveUserRequests(string userId);
+        Task<List<RequestDTO>> GetAllActiveUserRequests(string userId);
 
         /// <summary>
         /// Update a specific request in the database and check if both users in request have approved or "swiped right"
         /// </summary>
         /// <param name="updatedRequest">Updated request information from swipe</param>
         /// <returns>New updated Request</returns>
-        Task<Request> UpdateRequest(Request updatedRequest);
+        Task<RequestDTO> UpdateRequest(RequestDTO updatedRequest);
 
         /// <summary>
         /// Delete a specific request from the database between a Player and DM
@@ -54,6 +55,21 @@ namespace Espresso401_WebService.Models.Interfaces
         /// </summary>
         /// <param name="requestId">Id of the Requested to be deactivated</param>
         /// <returns>Task of completion</returns>
-        Task<Request> DeactivateRequest(int requestId);
+        Task<RequestDTO> DeactivateRequest(int requestId);
+
+        /// <summary>
+        /// Build a Request DTO from a Request object
+        /// </summary>
+        /// <param name="Request">Request to be converted to DTO</param>
+        /// <returns>Request DTO</returns>
+        Task<RequestDTO> BuildDTO(Request request);
+
+        /// <summary>
+        /// Deconstruct a RequestDTO into a Request object
+        /// </summary>
+        /// <param name="RequestDTO">RequestDTO to be deconstructed</param>
+        /// <returns>Request object from RequestDTO</returns>
+        Request DeconstructDTO(RequestDTO requestDTO);
+
     }
 }
