@@ -11,7 +11,7 @@ namespace Espresso401_WebService.Models.Interfaces
         /// </summary>
         /// <param name="party">Party information to be added to database</param>
         /// <returns>Newly created party</returns>
-        Task<Party> CreateParty(Party party);
+        Task<PartyDTO> CreateParty(PartyDTO party);
 
         /// <summary>
         /// Get a specific party by the Dungeon Master Id associated with it
@@ -45,14 +45,21 @@ namespace Espresso401_WebService.Models.Interfaces
         /// </summary>
         /// <param name="party">Updated party information</param>
         /// <returns>Task of completion for party update</returns>
-        Task UpdateParty(Party party);
+        Task UpdateParty(PartyDTO party);
 
         /// <summary>
         /// Build a PartyDTO object out of a Party Object
         /// </summary>
         /// <param name="party">Party object to build DTO from</param>
         /// <returns>PartyDTO object</returns>
-        Task<PartyDTO> BuildPartyDTO(Party party);
+        Task<PartyDTO> BuildPartyDTO(Party party); 
+        
+        /// <summary>
+        /// Deconstruct a PartyDTO object into a Party Object
+        /// </summary>
+        /// <param name="partyDTO">PartyDTO object to deconstruct</param>
+        /// <returns>Party object</returns>
+        Party DeconstructDTO(PartyDTO partyDTO);
 
         /// <summary>
         /// Add a player to a party with a Dungeon Master ID for the party and player ID to be added

@@ -40,14 +40,26 @@ namespace Espresso401_WebService.Models.Services
             DungeonMaster dungeonMaster = DeconstructDTO(dungeonMasterDTO);
             _context.Entry(dungeonMaster).State = EntityState.Added;
             var result = await _context.SaveChangesAsync();
+            dungeonMasterDTO.ActiveRequests = new List<RequestDTO>();
+
             var players = await _context.Players.Where(x => x.PartyId == 1).ToListAsync();
             if (players != null)
             {
                 foreach (var player in players)
                 {
-                    await _request.CreateRequest(player.Id, dungeonMaster.Id);
+                    RequestDTO newReq = await _request.CreateRequest(player.Id, dungeonMaster.Id);
+                    dungeonMasterDTO.ActiveRequests.Add(newReq);
                 }
             }
+            PartyDTO newParty = new PartyDTO
+            {
+                DungeonMasterId = dungeonMasterDTO.Id,
+                MaxSize = dungeonMasterDTO.PartySize,
+                Full = false
+            };
+
+            dungeonMasterDTO.Party = await _party.CreateParty(newParty);
+
             dungeonMasterDTO.Id = dungeonMaster.Id;
             return dungeonMasterDTO;
         }

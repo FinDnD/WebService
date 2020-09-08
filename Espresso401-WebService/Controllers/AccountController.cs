@@ -1,5 +1,6 @@
 ﻿using Espresso401_WebService.Models;
 using Espresso401_WebService.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,7 @@ namespace Espresso401_WebService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class AccountController : ControllerBase
     {
         private UserManager<ApplicationUser> _userManager;

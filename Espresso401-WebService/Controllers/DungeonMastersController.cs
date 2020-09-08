@@ -2,8 +2,10 @@
 using Espresso401_WebService.Models.DTOs;
 using Espresso401_WebService.Models.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espresso401_WebService.Controllers
@@ -14,10 +16,12 @@ namespace Espresso401_WebService.Controllers
     public class DungeonMastersController : ControllerBase
     {
         private readonly IDungeonMaster _dungeonMaster;
+        private UserManager<ApplicationUser> _userManager;
 
-        public DungeonMastersController(IDungeonMaster dungeonMaster)
+        public DungeonMastersController(IDungeonMaster dungeonMaster, UserManager<ApplicationUser> userManager)
         {
             _dungeonMaster = dungeonMaster;
+            _userManager = userManager;
         }
 
         // GET: api/DungeonMasters
@@ -63,11 +67,17 @@ namespace Espresso401_WebService.Controllers
         [HttpPost]
         public async Task<ActionResult<DungeonMaster>> PostDungeonMaster(DungeonMasterDTO dungeonMaster)
         {
-            DungeonMasterDTO result = await _dungeonMaster.CreateDungeonMaster(dungeonMaster);
+            var userClaims = User.Claims;
 
-            if (result.Id != 0)
+            if(userClaims != null)
             {
-                return CreatedAtAction("GetDungeonMaster", new { id = dungeonMaster.Id }, dungeonMaster);
+                dungeonMaster.UserId = userClaims.FirstOrDefault(x => x.Type == "UserId").Value;
+                DungeonMasterDTO result = await _dungeonMaster.CreateDungeonMaster(dungeonMaster);
+
+                if (result.Id != 0)
+                {
+                    return CreatedAtAction("GetDungeonMaster", new { id = dungeonMaster.Id }, dungeonMaster);
+                }
             }
             return null;
         }

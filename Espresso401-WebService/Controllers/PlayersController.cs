@@ -2,8 +2,11 @@
 using Espresso401_WebService.Models.DTOs;
 using Espresso401_WebService.Models.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Espresso401_WebService.Controllers
@@ -14,10 +17,13 @@ namespace Espresso401_WebService.Controllers
     public class PlayersController : ControllerBase
     {
         private readonly IPlayer _player;
+        private UserManager<ApplicationUser> _userManager;
 
-        public PlayersController(IPlayer player)
+
+        public PlayersController(IPlayer player, UserManager<ApplicationUser> userManager)
         {
             _player = player;
+            _userManager = userManager;
         }
 
         // GET: api/Players
@@ -63,11 +69,17 @@ namespace Espresso401_WebService.Controllers
         [HttpPost]
         public async Task<ActionResult<Player>> PostPlayer(PlayerDTO player)
         {
-            PlayerDTO result = await _player.CreatePlayer(player);
-
-            if (result.Id != 0)
+            var userClaims = User.Claims;
+            if(userClaims != null)
             {
-                return CreatedAtAction("GetPlayer", new { id = player.Id }, player);
+                player.UserId = userClaims.FirstOrDefault(x => x.Type == "UserId").Value;
+
+                PlayerDTO result = await _player.CreatePlayer(player);
+
+                if (result.Id != 0)
+                {
+                    return CreatedAtAction("GetPlayer", new { id = player.Id }, player);
+                }
             }
 
             return null;
