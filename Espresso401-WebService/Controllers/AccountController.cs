@@ -1,4 +1,5 @@
 ﻿using Espresso401_WebService.Models;
+using Espresso401_WebService.Models.Interfaces;
 using Espresso401_WebService.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,12 +24,16 @@ namespace Espresso401_WebService.Controllers
         private UserManager<ApplicationUser> _userManager;
         private SignInManager<ApplicationUser> _signInManager;
         private IConfiguration _config;
+        private IDungeonMaster _dungeonMaster;
+        private IPlayer _player;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IDungeonMaster dungeonMaster, IPlayer player)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _config = configuration;
+            _dungeonMaster = dungeonMaster;
+            _player = player;
         }
 
         [HttpPost("Register")]
@@ -49,6 +54,7 @@ namespace Espresso401_WebService.Controllers
                 var token = CreateToken(user, new List<string>() { registerInfo.ProfileType });
                 return Ok(new
                 {
+                    userid = user.Id,
                     jwt = new JwtSecurityTokenHandler().WriteToken(token),
                     expiration = token.ValidTo
                 });
@@ -69,6 +75,7 @@ namespace Espresso401_WebService.Controllers
 
                 return Ok(new
                 {
+                    userid = user.Id,
                     jwt = new JwtSecurityTokenHandler().WriteToken(token),
                     expiration = token.ValidTo
                 });
@@ -83,6 +90,7 @@ namespace Espresso401_WebService.Controllers
                 new Claim(JwtRegisteredClaimNames.Sub, appUser.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("UserId", appUser.Id),
+                new Claim("UserName", appUser.UserName)
             };
 
             foreach (var item in role)

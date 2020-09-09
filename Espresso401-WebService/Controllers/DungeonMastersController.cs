@@ -65,18 +65,19 @@ namespace Espresso401_WebService.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<DungeonMaster>> PostDungeonMaster(DungeonMasterDTO dungeonMaster)
+        public async Task<DungeonMasterDTO> PostDungeonMaster(DungeonMasterDTO dungeonMaster)
         {
             var userClaims = User.Claims;
 
             if(userClaims != null)
             {
                 dungeonMaster.UserId = userClaims.FirstOrDefault(x => x.Type == "UserId").Value;
+                dungeonMaster.UserName = userClaims.FirstOrDefault(x => x.Type == "UserName").Value;
                 DungeonMasterDTO result = await _dungeonMaster.CreateDungeonMaster(dungeonMaster);
 
                 if (result.Id != 0)
                 {
-                    return CreatedAtAction("GetDungeonMaster", new { id = dungeonMaster.Id }, dungeonMaster);
+                    return result;
                 }
             }
             return null;

@@ -27,7 +27,7 @@ namespace Espresso401_WebService.Data
                 new DungeonMaster
                 {
                     Id = 1,
-                    UserId = "SeededDM",
+                    UserId = "4c035675-9c5d-4763-aabe-6295555466b7",
                     CampaignName = "Campaign Sample",
                     CampaignDesc = "Deep in the dungeon's of Elderon, evil secrets stir. The world is once again thrust into peril, and our only hope is a small group of unlikely adventurers.",
                     ExperienceLevel = ExperienceLevel.Medium,

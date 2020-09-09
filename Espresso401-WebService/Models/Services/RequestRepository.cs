@@ -161,10 +161,27 @@ namespace Espresso401_WebService.Models.Services
             {
                 await _party.AddPlayerToParty(updatedRequest.DungeonMasterId, updatedRequest.PlayerId);
                 updatedRequest.Active = false;
+                await DeactivateAllPlayerRequests(updatedRequest.PlayerId);
             }
             _context.Entry(updatedRequest).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return updatedRequestDTO;
+        }
+
+        /// <summary>
+        /// Private method for Deactivating all of a player's requests, used when they are added toa  party
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        private async Task DeactivateAllPlayerRequests(int playerId)
+        {
+            List<Request> reqs = await _context.Requests.Where(x => x.PlayerId == playerId).ToListAsync();
+            foreach (Request req in reqs)
+            {
+                req.Active = false;
+                _context.Entry(req).State = EntityState.Modified;
+            }
+            await _context.SaveChangesAsync();
         }
 
         /// <summary>

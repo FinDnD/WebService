@@ -40,6 +40,7 @@ namespace Espresso401_WebService.Models.Services
             DungeonMaster dungeonMaster = DeconstructDTO(dungeonMasterDTO);
             _context.Entry(dungeonMaster).State = EntityState.Added;
             var result = await _context.SaveChangesAsync();
+            dungeonMasterDTO = await BuildDTO(dungeonMaster);
             dungeonMasterDTO.ActiveRequests = new List<RequestDTO>();
 
             var players = await _context.Players.Where(x => x.PartyId == 1).ToListAsync();
@@ -155,6 +156,7 @@ namespace Espresso401_WebService.Models.Services
             {
                 Id = dungeonMaster.Id,
                 UserId = dungeonMaster.UserId,
+                UserName = dungeonMaster.UserName,
                 CampaignName = dungeonMaster.CampaignName,
                 CampaignDesc = dungeonMaster.CampaignDesc,
                 ExperienceLevel = dungeonMaster.ExperienceLevel.ToString(),
@@ -177,6 +179,7 @@ namespace Espresso401_WebService.Models.Services
             {
                 Id = dungeonMasterDTO.Id,
                 UserId = dungeonMasterDTO.UserId,
+                UserName = dungeonMasterDTO.UserName,
                 CampaignName = dungeonMasterDTO.CampaignName,
                 CampaignDesc = dungeonMasterDTO.CampaignDesc,
                 ExperienceLevel = exp,

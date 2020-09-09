@@ -67,18 +67,19 @@ namespace Espresso401_WebService.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Player>> PostPlayer(PlayerDTO player)
+        public async Task<PlayerDTO> PostPlayer(PlayerDTO player)
         {
             var userClaims = User.Claims;
             if(userClaims != null)
             {
                 player.UserId = userClaims.FirstOrDefault(x => x.Type == "UserId").Value;
+                player.UserName = userClaims.FirstOrDefault(x => x.Type == "UserName").Value;
 
                 PlayerDTO result = await _player.CreatePlayer(player);
 
                 if (result.Id != 0)
                 {
-                    return CreatedAtAction("GetPlayer", new { id = player.Id }, player);
+                    return result;
                 }
             }
 

@@ -33,7 +33,7 @@ namespace Espresso401_WebServiceTests
             var dmRepo = BuildDmDb();
             await dmRepo.CreateDungeonMaster(newDm);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 4,
@@ -62,7 +62,7 @@ namespace Espresso401_WebServiceTests
             var dmRepo = BuildDmDb();
             await dmRepo.CreateDungeonMaster(newDm);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 4,
@@ -112,19 +112,19 @@ namespace Espresso401_WebServiceTests
             await dmRepo.CreateDungeonMaster(newDm2);
             await dmRepo.CreateDungeonMaster(newDm3);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 4,
                 Full = false
             };
-            Party newParty2 = new Party()
+            PartyDTO newParty2 = new PartyDTO()
             {
                 DungeonMasterId = newDm2.Id,
                 MaxSize = 133,
                 Full = false
             };
-            Party newParty3 = new Party()
+            PartyDTO newParty3 = new PartyDTO()
             {
                 DungeonMasterId = newDm3.Id,
                 MaxSize = 8,
@@ -161,7 +161,7 @@ namespace Espresso401_WebServiceTests
             var dmRepo = BuildDmDb();
             await dmRepo.CreateDungeonMaster(newDm);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 4,
@@ -191,7 +191,7 @@ namespace Espresso401_WebServiceTests
             var dmRepo = BuildDmDb();
             await dmRepo.CreateDungeonMaster(newDm);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 45,
@@ -212,7 +212,7 @@ namespace Espresso401_WebServiceTests
         public async Task CanUpdateParty()
         {
             var repo = BuildDb();
-            Party newPartyUpdate = new Party()
+            PartyDTO newPartyUpdate = new PartyDTO()
             {
                 Id = 1,
                 DungeonMasterId = 1,
