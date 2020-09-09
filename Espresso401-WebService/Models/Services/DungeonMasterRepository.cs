@@ -114,6 +114,17 @@ namespace Espresso401_WebService.Models.Services
                 dmDTO = await BuildDTO(dungeonMaster);
             }
             return dmDTO;
+        }      
+        
+        /// <summary>
+        /// Get a specific Dungeon Master based on the UserID associated with them
+        /// </summary>
+        /// <param name="userId">User ID associated with Dungeon Master to get</param>
+        /// <returns>Dungeon Master associated with the given userId</returns>
+        public async Task<DungeonMaster> GetDungeonMasterByUserIdNonDTO(string userId)
+        {
+            DungeonMaster dungeonMaster = await _context.DungeonMasters.Where(x => x.UserId == userId).FirstOrDefaultAsync();
+            return dungeonMaster;
         }
 
         /// <summary>
