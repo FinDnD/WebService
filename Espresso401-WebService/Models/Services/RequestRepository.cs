@@ -101,6 +101,7 @@ namespace Espresso401_WebService.Models.Services
             if (userPlayer != null)
             {
                 reqs = await _context.Requests.Where(x => x.PlayerId == userPlayer.Id && x.Active && !x.PlayerAccepted)
+                                              .Include(x => x.DungeonMaster)
                                               .OrderBy(x => x.DungeonMasterAccepted)
                                               .ToListAsync();
             }
@@ -108,6 +109,7 @@ namespace Espresso401_WebService.Models.Services
             {
                 var userDm = await _context.DungeonMasters.Where(x => x.UserId == userId).FirstOrDefaultAsync();
                 reqs = await _context.Requests.Where(x => x.DungeonMasterId == userDm.Id && x.Active && !x.DungeonMasterAccepted && x.Player.PartyId == 1)
+                                              .Include(x => x.Player)
                                               .OrderBy(x => x.PlayerAccepted)
                                               .ToListAsync();
             }
@@ -130,7 +132,7 @@ namespace Espresso401_WebService.Models.Services
             var userPlayer = await _context.Players.Where(x => x.UserId == userId).FirstOrDefaultAsync();
             if (userPlayer != null)
             {
-                rawRequests = await _context.Requests.Where(x => x.PlayerId == userPlayer.Id).ToListAsync();
+                rawRequests = await _context.Requests.Where(x => x.PlayerId == userPlayer.Id).Include(x => x.DungeonMaster).ToListAsync();
             }
             else
             {
@@ -139,7 +141,8 @@ namespace Espresso401_WebService.Models.Services
                 {
                     return new List<RequestDTO>();
                 }
-                rawRequests = await _context.Requests.Where(x => x.DungeonMasterId == userDm.Id).ToListAsync();
+
+                rawRequests = await _context.Requests.Where(x => x.DungeonMasterId == userDm.Id).Include(x => x.Player).ToListAsync();
             }
             List<RequestDTO> requestDTOs = new List<RequestDTO>();
             foreach (Request request in rawRequests)
@@ -180,6 +183,7 @@ namespace Espresso401_WebService.Models.Services
             {
                 req.Active = false;
                 _context.Entry(req).State = EntityState.Modified;
+                _context.Entry(req).State = EntityState.Detached;
             }
             await _context.SaveChangesAsync();
         }
@@ -223,6 +227,7 @@ namespace Espresso401_WebService.Models.Services
             {
                 Id = dm.Id,
                 UserId = dm.UserId,
+                UserName = dm.UserName,
                 CampaignName = dm.CampaignName,
                 CampaignDesc = dm.CampaignDesc,
                 ExperienceLevel = dm.ExperienceLevel.ToString(),
@@ -233,6 +238,7 @@ namespace Espresso401_WebService.Models.Services
             {
                 Id = player.Id,
                 UserId = player.UserId,
+                UserName = player.UserName,
                 ImageUrl = player.ImageUrl,
                 CharacterName = player.CharacterName,
                 Class = player.Class.ToString(),

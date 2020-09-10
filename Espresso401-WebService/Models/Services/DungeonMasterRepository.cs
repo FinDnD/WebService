@@ -168,6 +168,7 @@ namespace Espresso401_WebService.Models.Services
                 Id = dungeonMaster.Id,
                 UserId = dungeonMaster.UserId,
                 UserName = dungeonMaster.UserName,
+                ImageUrl = dungeonMaster.ImageUrl,
                 CampaignName = dungeonMaster.CampaignName,
                 CampaignDesc = dungeonMaster.CampaignDesc,
                 ExperienceLevel = dungeonMaster.ExperienceLevel.ToString(),

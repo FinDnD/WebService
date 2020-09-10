@@ -31,7 +31,7 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
 
             PartyDTO newParty = new PartyDTO()
             {
@@ -44,7 +44,6 @@ namespace Espresso401_WebServiceTests
 
             Assert.NotNull(result);
             Assert.NotEqual(0, result.Id);
-            Assert.Equal(newParty.Id, result.Id);
             Assert.Equal(newParty.MaxSize, result.MaxSize);
         }
 
@@ -60,7 +59,7 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
 
             PartyDTO newParty = new PartyDTO()
             {
@@ -73,7 +72,7 @@ namespace Espresso401_WebServiceTests
 
             Assert.NotNull(create);
 
-            await repo.DeleteParty(create.Id);
+            await repo.DeleteParty(newDm.Id);
 
             var result = await repo.GetPartyById(create.Id);
 
@@ -108,9 +107,9 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio3"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
-            await dmRepo.CreateDungeonMaster(newDm2);
-            await dmRepo.CreateDungeonMaster(newDm3);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
+            newDm2 = await dmRepo.CreateDungeonMaster(newDm2);
+            newDm3 = await dmRepo.CreateDungeonMaster(newDm3);
 
             PartyDTO newParty = new PartyDTO()
             {
@@ -159,7 +158,7 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
 
             PartyDTO newParty = new PartyDTO()
             {
@@ -189,7 +188,7 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
 
             PartyDTO newParty = new PartyDTO()
             {
@@ -199,9 +198,9 @@ namespace Espresso401_WebServiceTests
             };
 
             var repo = BuildDb();
-            await repo.CreateParty(newParty);
+            newParty = await repo.CreateParty(newParty);
 
-            var result = await repo.GetPartyByDMId(newParty.Id);
+            var result = await repo.GetPartyByDMId(newDm.Id);
 
             Assert.NotNull(result);
             Assert.Equal(45, result.MaxSize);
