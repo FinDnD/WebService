@@ -23,8 +23,15 @@ namespace Espresso401_WebService.Models.Interfaces
         /// Get a specific Player from the database by the associated userId
         /// </summary>
         /// <param name="userId">User ID associated with Player to be searched for</param>
+        /// <returns>Player associated with the given ID as a DTO</returns>
+        Task<PlayerDTO> GetPlayerByUserId(string userId);  
+        
+        /// <summary>
+        /// Get a specific Player from the database by the associated userId
+        /// </summary>
+        /// <param name="userId">User ID associated with Player to be searched for</param>
         /// <returns>Player associated with the given ID</returns>
-        Task<PlayerDTO> GetPlayerByUserId(string userId);
+        Task<Player> GetPlayerByUserIdNonDTO(string userId);
 
         /// <summary>
         /// Create a new Player Profile for a user in the database

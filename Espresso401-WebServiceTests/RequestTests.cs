@@ -29,9 +29,16 @@ namespace Espresso401_WebServiceTests
         {
             var repo = BuildDb();
             var newReq = await repo.CreateRequest(1, 1);
-            var result = await repo.GetAllUserRequests("SeededDM");
+            var result = await repo.GetAllUserRequests("4c035675-9c5d-4763-aabe-6295555466b7");
+            bool contained = false;
+            foreach (var item in result)
+            {
+                if (item.DungeonMasterId == newReq.DungeonMasterId && item.PlayerId == newReq.PlayerId) contained = true;
+            }
+
+
             Assert.NotNull(result);
-            Assert.Contains(newReq, result);
+            Assert.True(contained);
         }
 
         [Fact]
@@ -60,7 +67,7 @@ namespace Espresso401_WebServiceTests
 
             PlayerDTO newPlayer = new PlayerDTO()
             {
-                UserId = "test1",
+                UserId = "test3",
                 CharacterName = "Test1Name",
                 Class = "Barbarian",
                 Race = "Dragonborn",
@@ -71,7 +78,7 @@ namespace Espresso401_WebServiceTests
             };
             PlayerDTO newPlayer2 = new PlayerDTO()
             {
-                UserId = "test2",
+                UserId = "test4",
                 CharacterName = "Test2Name",
                 Class = "Monk",
                 Race = "HalfElf",
@@ -80,10 +87,10 @@ namespace Espresso401_WebServiceTests
                 LawAlignment = 50,
                 PartyId = 1
             };
-            await playerRepo.CreatePlayer(newPlayer);
-            await playerRepo.CreatePlayer(newPlayer2);
-            await dmRepo.CreateDungeonMaster(newDm);
-            await dmRepo.CreateDungeonMaster(newDm2);
+            newPlayer = await playerRepo.CreatePlayer(newPlayer);
+            newPlayer2 = await playerRepo.CreatePlayer(newPlayer2);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
+            newDm2 = await dmRepo.CreateDungeonMaster(newDm2);
 
             #endregion DataSeeding
 
@@ -95,10 +102,22 @@ namespace Espresso401_WebServiceTests
 
             var result = await repo.GetAllUserRequests(newPlayer.UserId);
 
-            Assert.Contains(req1, result);
-            Assert.Contains(req2, result);
-            Assert.DoesNotContain(req3, result);
-            Assert.DoesNotContain(req4, result);
+            bool contained1 = false;
+            bool contained2 = false;
+            bool contained3 = false;
+            bool contained4 = false;
+            foreach (var item in result)
+            {
+                if (item.DungeonMasterId == newDm.Id && item.PlayerId == newPlayer.Id) contained1 = true;
+                else if (item.DungeonMasterId == newDm2.Id && item.PlayerId == newPlayer.Id) contained2 = true;
+                else if (item.DungeonMasterId == newDm.Id && item.PlayerId == newPlayer2.Id) contained3 = true;
+                else if (item.DungeonMasterId == newDm2.Id && item.PlayerId == newPlayer2.Id) contained4 = true;
+            }
+
+            Assert.True(contained1);
+            Assert.True(contained2);
+            Assert.False(contained3);
+            Assert.False(contained4);
         }
 
         [Fact]
@@ -127,7 +146,7 @@ namespace Espresso401_WebServiceTests
 
             PlayerDTO newPlayer = new PlayerDTO()
             {
-                UserId = "test1",
+                UserId = "test3",
                 CharacterName = "Test1Name",
                 Class = "Barbarian",
                 Race = "Dragonborn",
@@ -138,7 +157,7 @@ namespace Espresso401_WebServiceTests
             };
             PlayerDTO newPlayer2 = new PlayerDTO()
             {
-                UserId = "test2",
+                UserId = "test4",
                 CharacterName = "Test2Name",
                 Class = "Monk",
                 Race = "HalfElf",
@@ -147,10 +166,11 @@ namespace Espresso401_WebServiceTests
                 LawAlignment = 50,
                 PartyId = 1
             };
-            await playerRepo.CreatePlayer(newPlayer);
-            await playerRepo.CreatePlayer(newPlayer2);
-            await dmRepo.CreateDungeonMaster(newDm);
-            await dmRepo.CreateDungeonMaster(newDm2);
+
+            newPlayer = await playerRepo.CreatePlayer(newPlayer);
+            newPlayer2 = await playerRepo.CreatePlayer(newPlayer2);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
+            newDm2 = await dmRepo.CreateDungeonMaster(newDm2);
 
             #endregion DataSeeding
 
@@ -164,10 +184,21 @@ namespace Espresso401_WebServiceTests
 
             var result = await repo.GetAllActiveUserRequests(newPlayer.UserId);
 
-            Assert.Contains(req2, result);
-            Assert.DoesNotContain(req1, result);
-            Assert.DoesNotContain(req3, result);
-            Assert.DoesNotContain(req4, result);
+            bool contained1 = false;
+            bool contained2 = false;
+            bool contained3 = false;
+            bool contained4 = false;
+            foreach (var item in result)
+            {
+                if (item.DungeonMasterId == newDm.Id && item.PlayerId == newPlayer.Id) contained1 = true;
+                else if (item.DungeonMasterId == newDm2.Id && item.PlayerId == newPlayer.Id) contained2 = true;
+                else if (item.DungeonMasterId == newDm.Id && item.PlayerId == newPlayer2.Id) contained3 = true;
+                else if (item.DungeonMasterId == newDm2.Id && item.PlayerId == newPlayer2.Id) contained4 = true;
+            }
+            Assert.True(contained1);
+            Assert.True(contained2);
+            Assert.False(contained3);
+            Assert.False(contained4);
         }
 
         [Fact]
@@ -196,7 +227,7 @@ namespace Espresso401_WebServiceTests
 
             PlayerDTO newPlayer = new PlayerDTO()
             {
-                UserId = "test1",
+                UserId = "test3",
                 CharacterName = "Test1Name",
                 Class = "Barbarian",
                 Race = "Dragonborn",
@@ -207,7 +238,7 @@ namespace Espresso401_WebServiceTests
             };
             PlayerDTO newPlayer2 = new PlayerDTO()
             {
-                UserId = "test2",
+                UserId = "test4",
                 CharacterName = "Test2Name",
                 Class = "Monk",
                 Race = "HalfElf",
@@ -216,10 +247,10 @@ namespace Espresso401_WebServiceTests
                 LawAlignment = 50,
                 PartyId = 1
             };
-            await playerRepo.CreatePlayer(newPlayer);
-            await playerRepo.CreatePlayer(newPlayer2);
-            await dmRepo.CreateDungeonMaster(newDm);
-            await dmRepo.CreateDungeonMaster(newDm2);
+            newPlayer = await playerRepo.CreatePlayer(newPlayer);
+            newPlayer2 = await playerRepo.CreatePlayer(newPlayer2);
+            newDm =await dmRepo.CreateDungeonMaster(newDm);
+            newDm2 = await dmRepo.CreateDungeonMaster(newDm2);
 
             #endregion DataSeeding
 
@@ -247,6 +278,7 @@ namespace Espresso401_WebServiceTests
                 ExperienceLevel = "Medium",
                 PersonalBio = "Test Personal Bio"
             };
+
             DungeonMasterDTO newDm2 = new DungeonMasterDTO()
             {
                 UserId = "test2",
@@ -258,7 +290,7 @@ namespace Espresso401_WebServiceTests
 
             PlayerDTO newPlayer = new PlayerDTO()
             {
-                UserId = "test1",
+                UserId = "test3",
                 CharacterName = "Test1Name",
                 Class = "Barbarian",
                 Race = "Dragonborn",
@@ -267,9 +299,10 @@ namespace Espresso401_WebServiceTests
                 LawAlignment = 50,
                 PartyId = 1
             };
+
             PlayerDTO newPlayer2 = new PlayerDTO()
             {
-                UserId = "test2",
+                UserId = "test4",
                 CharacterName = "Test2Name",
                 Class = "Monk",
                 Race = "HalfElf",
@@ -278,10 +311,10 @@ namespace Espresso401_WebServiceTests
                 LawAlignment = 50,
                 PartyId = 1
             };
-            await playerRepo.CreatePlayer(newPlayer);
-            await playerRepo.CreatePlayer(newPlayer2);
-            await dmRepo.CreateDungeonMaster(newDm);
-            await dmRepo.CreateDungeonMaster(newDm2);
+            newPlayer = await playerRepo.CreatePlayer(newPlayer);
+            newPlayer2 = await playerRepo.CreatePlayer(newPlayer2);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
+            newDm2 = await dmRepo.CreateDungeonMaster(newDm2);
 
             #endregion DataSeeding
 
@@ -297,8 +330,21 @@ namespace Espresso401_WebServiceTests
 
             var result = await repo.GetAllActiveUserRequests(newPlayer.UserId);
 
-            Assert.Contains(req2, result);
-            Assert.DoesNotContain(req1, result);
+            bool contained1 = false;
+            bool contained2 = false;
+            bool contained3 = false;
+            bool contained4 = false;
+            foreach (var item in result)
+            {
+                if (item.DungeonMasterId == newDm.Id && item.PlayerId == newPlayer.Id) contained1 = true;
+                else if (item.DungeonMasterId == newDm2.Id && item.PlayerId == newPlayer.Id) contained2 = true;
+                else if (item.DungeonMasterId == newDm.Id && item.PlayerId == newPlayer2.Id) contained3 = true;
+                else if (item.DungeonMasterId == newDm2.Id && item.PlayerId == newPlayer2.Id) contained4 = true;
+            }
+            Assert.False(contained1);
+            Assert.True(contained2);
+            Assert.False(contained3);
+            Assert.False(contained4);
         }
 
         [Fact]
@@ -310,7 +356,7 @@ namespace Espresso401_WebServiceTests
 
             Assert.True(newReq.Active);
 
-            await repo.DeactivateRequest(newReq.Id);
+            newReq = await repo.DeactivateRequest(newReq.Id);
 
             Assert.False(newReq.Active);
         }

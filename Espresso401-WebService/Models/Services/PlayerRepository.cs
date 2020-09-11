@@ -104,6 +104,17 @@ namespace Espresso401_WebService.Models.Services
                 dto = await BuildDTO(player);
             }
             return dto;
+        }     
+        
+        /// <summary>
+        /// Get a specific Player from the database by the associated userId
+        /// </summary>
+        /// <param name="userId">User ID associated with Player to be searched for</param>
+        /// <returns>Player associated with the given ID</returns>
+        public async Task<Player> GetPlayerByUserIdNonDTO(string userId)
+        {
+            Player player = await _context.Players.Where(x => x.UserId == userId).FirstOrDefaultAsync();
+            return player;
         }
 
         /// <summary>
@@ -147,6 +158,7 @@ namespace Espresso401_WebService.Models.Services
                 Id = player.Id,
                 UserId = player.UserId,
                 UserName = player.UserName,
+                UserEmail = player.UserEmail,
                 ImageUrl = player.ImageUrl,
                 CharacterName = player.CharacterName,
                 Class = player.Class.ToString(),
@@ -180,6 +192,7 @@ namespace Espresso401_WebService.Models.Services
                 Id = playerDTO.Id,
                 UserId = playerDTO.UserId,
                 UserName = playerDTO.UserName,
+                UserEmail = playerDTO.UserEmail,
                 ImageUrl = playerDTO.ImageUrl,
                 CharacterName = playerDTO.CharacterName,
                 Class = playerClass,

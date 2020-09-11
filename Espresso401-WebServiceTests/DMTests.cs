@@ -31,7 +31,6 @@ namespace Espresso401_WebServiceTests
 
             Assert.NotNull(result);
             Assert.NotEqual(0, result.Id);
-            Assert.Equal(newDm.Id, result.Id);
             Assert.Equal(newDm.CampaignName, result.CampaignName);
         }
 
@@ -64,14 +63,13 @@ namespace Espresso401_WebServiceTests
             };
             var repo = BuildDb();
             await repo.CreateDungeonMaster(newDm);
-            await repo.CreateDungeonMaster(newDm2);
+            newDm2 = await repo.CreateDungeonMaster(newDm2);
             await repo.CreateDungeonMaster(newDm3);
 
             var result = await repo.GetDungeonMasterById(newDm2.Id);
 
             Assert.NotNull(result);
             Assert.NotEqual(0, result.Id);
-            Assert.Equal(newDm2.Id, result.Id);
             Assert.Equal(newDm2.CampaignName, result.CampaignName);
             Assert.Equal(newDm2.CampaignDesc, result.CampaignDesc);
         }
@@ -105,7 +103,7 @@ namespace Espresso401_WebServiceTests
             };
             var repo = BuildDb();
             await repo.CreateDungeonMaster(newDm);
-            await repo.CreateDungeonMaster(newDm2);
+            newDm2 = await repo.CreateDungeonMaster(newDm2);
             await repo.CreateDungeonMaster(newDm3);
 
             var result = await repo.GetDungeonMasterByUserId("test2");
@@ -200,30 +198,11 @@ namespace Espresso401_WebServiceTests
 
             Assert.NotNull(create);
 
-            await repo.DeleteDungeonMaster(newDm.Id);
+            await repo.DeleteDungeonMaster(create.Id);
 
             var result = await repo.GetDungeonMasterByUserId("test1");
 
             Assert.Null(result);
-        }
-
-        [Fact]
-        public async Task CanBuildDTO()
-        {
-            var repo = BuildDb();
-            DungeonMaster newDungeonMaster = new DungeonMaster()
-            {
-                UserId = "test1",
-                CampaignName = "Test Campaign",
-                CampaignDesc = "Test Campaign Description",
-                ExperienceLevel = ExperienceLevel.Medium,
-                PersonalBio = "Test Personal Bio"
-            };
-            DungeonMasterDTO dungeonMasterDTO = await repo.BuildDTO(newDungeonMaster);
-
-            Assert.NotNull(dungeonMasterDTO);
-            Assert.Equal(newDungeonMaster.UserId, dungeonMasterDTO.UserId);
-            Assert.Equal(newDungeonMaster.PersonalBio, dungeonMasterDTO.PersonalBio);
         }
 
         [Fact]

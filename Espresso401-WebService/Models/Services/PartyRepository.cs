@@ -105,6 +105,7 @@ namespace Espresso401_WebService.Models.Services
         {
             DungeonMaster dm = await _context.DungeonMasters.FindAsync(party.DungeonMasterId);
             List<Player> members = await _context.Players.Where(x => x.PartyId == party.Id).ToListAsync();
+
             PartyDTO dto = new PartyDTO
             {
                 Id = party.Id,
@@ -116,18 +117,22 @@ namespace Espresso401_WebService.Models.Services
                 {
                     Id = dm.Id,
                     UserName = dm.UserName,
+                    UserEmail = dm.UserEmail,
                     CampaignName = dm.CampaignName,
                     CampaignDesc = dm.CampaignDesc,
                     ExperienceLevel = dm.ExperienceLevel.ToString(),
-                    PersonalBio = dm.PersonalBio
+                    PersonalBio = dm.PersonalBio,
+                    ImageUrl = dm.ImageUrl
                 }
             };
+
             foreach (Player player in members)
             {
                 dto.PlayersInParty.Add(new PartyPlayerDTO
                 {
                     Id = player.Id,
                     ImageUrl = player.ImageUrl,
+                    UserEmail = player.UserEmail,
                     CharacterName = player.CharacterName,
                     Class = player.Class.ToString(),
                     Race = player.Race.ToString(),
@@ -190,6 +195,8 @@ namespace Espresso401_WebService.Models.Services
             Player player = await _context.Players.Where(x => x.Id == playerId).FirstOrDefaultAsync();
             player.PartyId = party.Id;
             _context.Entry(player).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
             _context.Entry(newPlayer).State = EntityState.Added;
             await _context.SaveChangesAsync();
         }

@@ -114,6 +114,17 @@ namespace Espresso401_WebService.Models.Services
                 dmDTO = await BuildDTO(dungeonMaster);
             }
             return dmDTO;
+        }      
+        
+        /// <summary>
+        /// Get a specific Dungeon Master based on the UserID associated with them
+        /// </summary>
+        /// <param name="userId">User ID associated with Dungeon Master to get</param>
+        /// <returns>Dungeon Master associated with the given userId</returns>
+        public async Task<DungeonMaster> GetDungeonMasterByUserIdNonDTO(string userId)
+        {
+            DungeonMaster dungeonMaster = await _context.DungeonMasters.Where(x => x.UserId == userId).FirstOrDefaultAsync();
+            return dungeonMaster;
         }
 
         /// <summary>
@@ -155,8 +166,10 @@ namespace Espresso401_WebService.Models.Services
             DungeonMasterDTO result = new DungeonMasterDTO
             {
                 Id = dungeonMaster.Id,
+                UserEmail = dungeonMaster.UserEmail,
                 UserId = dungeonMaster.UserId,
                 UserName = dungeonMaster.UserName,
+                ImageUrl = dungeonMaster.ImageUrl,
                 CampaignName = dungeonMaster.CampaignName,
                 CampaignDesc = dungeonMaster.CampaignDesc,
                 ExperienceLevel = dungeonMaster.ExperienceLevel.ToString(),
@@ -180,6 +193,7 @@ namespace Espresso401_WebService.Models.Services
                 Id = dungeonMasterDTO.Id,
                 UserId = dungeonMasterDTO.UserId,
                 UserName = dungeonMasterDTO.UserName,
+                UserEmail = dungeonMasterDTO.UserEmail,
                 CampaignName = dungeonMasterDTO.CampaignName,
                 CampaignDesc = dungeonMasterDTO.CampaignDesc,
                 ExperienceLevel = exp,

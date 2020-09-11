@@ -17,7 +17,14 @@ namespace Espresso401_WebService.Models.Interfaces
         /// </summary>
         /// <param name="userId">User ID associated with Dungeon Master to get</param>
         /// <returns>Dungeon Master associated with the given userId</returns>
-        Task<DungeonMasterDTO> GetDungeonMasterByUserId(string userId);
+        Task<DungeonMasterDTO> GetDungeonMasterByUserId(string userId);  
+        
+        /// <summary>
+        /// Get a specific Dungeon Master based on the UserID associated with them
+        /// </summary>
+        /// <param name="userId">User ID associated with Dungeon Master to get</param>
+        /// <returns>Dungeon Master associated with the given userId</returns>
+        Task<DungeonMaster> GetDungeonMasterByUserIdNonDTO(string userId);
 
         /// <summary>
         /// Get a specific Dungeon Master based on their ID
