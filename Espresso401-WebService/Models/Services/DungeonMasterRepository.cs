@@ -166,6 +166,7 @@ namespace Espresso401_WebService.Models.Services
             DungeonMasterDTO result = new DungeonMasterDTO
             {
                 Id = dungeonMaster.Id,
+                UserEmail = dungeonMaster.UserEmail,
                 UserId = dungeonMaster.UserId,
                 UserName = dungeonMaster.UserName,
                 ImageUrl = dungeonMaster.ImageUrl,
@@ -192,6 +193,7 @@ namespace Espresso401_WebService.Models.Services
                 Id = dungeonMasterDTO.Id,
                 UserId = dungeonMasterDTO.UserId,
                 UserName = dungeonMasterDTO.UserName,
+                UserEmail = dungeonMasterDTO.UserEmail,
                 CampaignName = dungeonMasterDTO.CampaignName,
                 CampaignDesc = dungeonMasterDTO.CampaignDesc,
                 ExperienceLevel = exp,

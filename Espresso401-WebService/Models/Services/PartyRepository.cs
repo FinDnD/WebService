@@ -117,6 +117,7 @@ namespace Espresso401_WebService.Models.Services
                 {
                     Id = dm.Id,
                     UserName = dm.UserName,
+                    UserEmail = dm.UserEmail,
                     CampaignName = dm.CampaignName,
                     CampaignDesc = dm.CampaignDesc,
                     ExperienceLevel = dm.ExperienceLevel.ToString(),
@@ -131,6 +132,7 @@ namespace Espresso401_WebService.Models.Services
                 {
                     Id = player.Id,
                     ImageUrl = player.ImageUrl,
+                    UserEmail = player.UserEmail,
                     CharacterName = player.CharacterName,
                     Class = player.Class.ToString(),
                     Race = player.Race.ToString(),
@@ -194,7 +196,6 @@ namespace Espresso401_WebService.Models.Services
             player.PartyId = party.Id;
             _context.Entry(player).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            _context.Entry(player).State = EntityState.Detached;
 
             _context.Entry(newPlayer).State = EntityState.Added;
             await _context.SaveChangesAsync();
