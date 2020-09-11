@@ -64,7 +64,7 @@ namespace Espresso401_WebService.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutParty(int id, Party party)
+        public async Task<IActionResult> PutParty(int id, PartyDTO party)
         {
             if (id != party.Id)
             {
@@ -80,7 +80,7 @@ namespace Espresso401_WebService.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Party>> PostParty(Party party)
+        public async Task<ActionResult<Party>> PostParty(PartyDTO party)
         {
             var result = await _party.CreateParty(party);
 

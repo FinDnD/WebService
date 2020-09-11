@@ -40,14 +40,15 @@ namespace Espresso401_WebService.Models.Services
             player.PartyId = 1;
             _context.Entry(player).State = EntityState.Added;
             await _context.SaveChangesAsync();
-            playerDTO.ActiveRequests = new List<Request>();
+            playerDTO = await BuildDTO(player);
+            playerDTO.ActiveRequests = new List<RequestDTO>();
             // TODO: Only get DMs with a party that isn't already full
             var dms = await _context.DungeonMasters.ToListAsync();
             if (dms != null)
             {
                 foreach (var dm in dms)
                 {
-                    Request newReq = await _request.CreateRequest(player.Id, dm.Id);
+                    RequestDTO newReq = await _request.CreateRequest(player.Id, dm.Id);
                     playerDTO.ActiveRequests.Add(newReq);
                 }
             }
@@ -103,6 +104,17 @@ namespace Espresso401_WebService.Models.Services
                 dto = await BuildDTO(player);
             }
             return dto;
+        }     
+        
+        /// <summary>
+        /// Get a specific Player from the database by the associated userId
+        /// </summary>
+        /// <param name="userId">User ID associated with Player to be searched for</param>
+        /// <returns>Player associated with the given ID</returns>
+        public async Task<Player> GetPlayerByUserIdNonDTO(string userId)
+        {
+            Player player = await _context.Players.Where(x => x.UserId == userId).FirstOrDefaultAsync();
+            return player;
         }
 
         /// <summary>
@@ -145,6 +157,8 @@ namespace Espresso401_WebService.Models.Services
             {
                 Id = player.Id,
                 UserId = player.UserId,
+                UserName = player.UserName,
+                UserEmail = player.UserEmail,
                 ImageUrl = player.ImageUrl,
                 CharacterName = player.CharacterName,
                 Class = player.Class.ToString(),
@@ -177,6 +191,8 @@ namespace Espresso401_WebService.Models.Services
             {
                 Id = playerDTO.Id,
                 UserId = playerDTO.UserId,
+                UserName = playerDTO.UserName,
+                UserEmail = playerDTO.UserEmail,
                 ImageUrl = playerDTO.ImageUrl,
                 CharacterName = playerDTO.CharacterName,
                 Class = playerClass,

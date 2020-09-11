@@ -22,11 +22,13 @@ namespace Espresso401_WebService.Models.Services
         /// </summary>
         /// <param name="party">Party information to be added to database</param>
         /// <returns>Newly created party</returns>
-        public async Task<Party> CreateParty(Party party)
+        public async Task<PartyDTO> CreateParty(PartyDTO partyDTO)
         {
+            Party party = DeconstructDTO(partyDTO);
             _context.Entry(party).State = EntityState.Added;
-            var result = await _context.SaveChangesAsync();
-            return party;
+            await _context.SaveChangesAsync();
+
+            return await BuildPartyDTO(party);
         }
 
         /// <summary>
@@ -103,6 +105,7 @@ namespace Espresso401_WebService.Models.Services
         {
             DungeonMaster dm = await _context.DungeonMasters.FindAsync(party.DungeonMasterId);
             List<Player> members = await _context.Players.Where(x => x.PartyId == party.Id).ToListAsync();
+
             PartyDTO dto = new PartyDTO
             {
                 Id = party.Id,
@@ -113,18 +116,23 @@ namespace Espresso401_WebService.Models.Services
                 DungeonMasterDTO = new PartyDmDTO
                 {
                     Id = dm.Id,
+                    UserName = dm.UserName,
+                    UserEmail = dm.UserEmail,
                     CampaignName = dm.CampaignName,
                     CampaignDesc = dm.CampaignDesc,
                     ExperienceLevel = dm.ExperienceLevel.ToString(),
-                    PersonalBio = dm.PersonalBio
+                    PersonalBio = dm.PersonalBio,
+                    ImageUrl = dm.ImageUrl
                 }
             };
+
             foreach (Player player in members)
             {
                 dto.PlayersInParty.Add(new PartyPlayerDTO
                 {
                     Id = player.Id,
                     ImageUrl = player.ImageUrl,
+                    UserEmail = player.UserEmail,
                     CharacterName = player.CharacterName,
                     Class = player.Class.ToString(),
                     Race = player.Race.ToString(),
@@ -135,12 +143,30 @@ namespace Espresso401_WebService.Models.Services
         }
 
         /// <summary>
+        /// Deconstruct a PartyDTO object into a Party Object
+        /// </summary>
+        /// <param name="partyDTO">PartyDTO object to deconstruct</param>
+        /// <returns>Party object</returns>
+        public Party DeconstructDTO(PartyDTO partyDTO)
+        {
+            Party party = new Party
+            {
+                Id = partyDTO.Id,
+                DungeonMasterId = partyDTO.DungeonMasterId,
+                MaxSize = partyDTO.MaxSize,
+                Full = partyDTO.Full,
+            };
+            return party;
+        }
+
+        /// <summary>
         /// Update a specific party
         /// </summary>
         /// <param name="party">Updated party information</param>
         /// <returns>Task of completion for party update</returns>
-        public async Task UpdateParty(Party party)
+        public async Task UpdateParty(PartyDTO partyDTO)
         {
+            Party party = DeconstructDTO(partyDTO);
             _context.Entry(party).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
@@ -154,6 +180,13 @@ namespace Espresso401_WebService.Models.Services
         public async Task AddPlayerToParty(int dmId, int playerId)
         {
             Party party = await _context.Parties.Where(x => x.DungeonMasterId == dmId).FirstOrDefaultAsync();
+            var partyMembers = await _context.PlayerInParty.Where(x => x.PartyId == party.Id).ToListAsync();
+            if(partyMembers.Count() + 1 >= party.MaxSize)
+            {
+                party.Full = true;
+                _context.Entry(party).State = EntityState.Modified;
+            }
+
             PlayerInParty newPlayer = new PlayerInParty
             {
                 PartyId = party.Id,
@@ -162,6 +195,8 @@ namespace Espresso401_WebService.Models.Services
             Player player = await _context.Players.Where(x => x.Id == playerId).FirstOrDefaultAsync();
             player.PartyId = party.Id;
             _context.Entry(player).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
             _context.Entry(newPlayer).State = EntityState.Added;
             await _context.SaveChangesAsync();
         }
@@ -178,6 +213,11 @@ namespace Espresso401_WebService.Models.Services
             PlayerInParty playerInParty = await _context.PlayerInParty.FindAsync(playerId, party.Id);
             if (playerInParty != null)
             {
+                if (party.Full)
+                {
+                    party.Full = false;
+                    _context.Entry(party).State = EntityState.Modified;
+                }
                 _context.Entry(playerInParty).State = EntityState.Deleted;
                 var playerReqs = await _context.Requests.Where(x => x.PlayerId == playerId).ToListAsync();
                 // TODO: Revisit this logic
@@ -186,9 +226,11 @@ namespace Espresso401_WebService.Models.Services
                     req.PlayerAccepted = false;
                     req.DungeonMasterAccepted = false;
                     req.Active = true;
+                    _context.Entry(req).State = EntityState.Modified;
                 }
                 Player player = await _context.Players.Where(x => x.Id == playerId).FirstOrDefaultAsync();
                 player.PartyId = 1;
+                _context.Entry(player).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
         }

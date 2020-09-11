@@ -36,7 +36,6 @@ namespace Espresso401_WebServiceTests
 
             Assert.NotNull(result);
             Assert.NotEqual(0, result.Id);
-            Assert.Equal(newPlayer.Id, result.Id);
             Assert.Equal(newPlayer.CharacterName, result.CharacterName);
         }
 
@@ -77,9 +76,9 @@ namespace Espresso401_WebServiceTests
                 PartyId = 1
             };
             var repo = BuildDb();
-            await repo.CreatePlayer(newPlayer);
-            await repo.CreatePlayer(newPlayer2);
-            await repo.CreatePlayer(newPlayer3);
+            newPlayer = await repo.CreatePlayer(newPlayer);
+            newPlayer2 = await repo.CreatePlayer(newPlayer2);
+            newPlayer3 = await repo.CreatePlayer(newPlayer3);
 
             var result = await repo.GetPlayerById(newPlayer2.Id);
 
@@ -128,7 +127,7 @@ namespace Espresso401_WebServiceTests
             };
             var repo = BuildDb();
             await repo.CreatePlayer(newPlayer);
-            await repo.CreatePlayer(newPlayer2);
+            newPlayer2 = await repo.CreatePlayer(newPlayer2);
             await repo.CreatePlayer(newPlayer3);
 
             var result = await repo.GetPlayerByUserId("test2");
@@ -196,23 +195,10 @@ namespace Espresso401_WebServiceTests
         [Fact]
         public async Task CanUpdatePlayer()
         {
-            PlayerDTO newPlayer = new PlayerDTO()
-            {
-                UserId = "test1",
-                CharacterName = "Test1Name",
-                Class = "Barbarian",
-                Race = "Dragonborn",
-                ExperienceLevel = "FirstTime",
-                GoodAlignment = 50,
-                LawAlignment = 50,
-                PartyId = 1
-            };
             var repo = BuildDb();
-            var create = repo.CreatePlayer(newPlayer);
-            int id = create.Id;
             PlayerDTO playerUpdate = new PlayerDTO()
             {
-                Id = id,
+                Id = 1,
                 UserId = "test1Update",
                 CharacterName = "Test1Name",
                 Class = "Druid",
@@ -226,9 +212,9 @@ namespace Espresso401_WebServiceTests
             var update = await repo.UpdatePlayer(playerUpdate);
 
             Assert.NotNull(update);
-            Assert.Equal(create.Id, update.Id);
+            Assert.Equal(playerUpdate.Id, update.Id);
             Assert.Equal("test1Update", update.UserId);
-            Assert.NotEqual(create.Result.Class, update.Class);
+            Assert.Equal(playerUpdate.Class, update.Class);
         }
 
         [Fact]
@@ -250,7 +236,7 @@ namespace Espresso401_WebServiceTests
 
             Assert.NotNull(create);
 
-            await repo.DeletePlayer(newPlayer.Id);
+            await repo.DeletePlayer(create.Id);
 
             var result = await repo.GetPlayerByUserId("test1");
 

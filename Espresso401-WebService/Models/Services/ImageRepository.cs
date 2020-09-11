@@ -1,9 +1,12 @@
-﻿using Espresso401_WebService.Models.DTOs;
+﻿using Espresso401_WebService.Data;
+using Espresso401_WebService.Models.DTOs;
 using Espresso401_WebService.Models.Interfaces;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using SQLitePCL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +19,18 @@ namespace Espresso401_WebService.Models.Services
         private IConfiguration _config;
         private IDungeonMaster _dungeonMaster;
         private IPlayer _player;
+        private readonly AppDbContext _context;
 
         public CloudStorageAccount CloudStorageAccount { get; set; }
 
         public CloudBlobClient CloudBlobClient { get; set; }
 
-        public ImageRepository(IConfiguration config, IDungeonMaster dungeonMaster, IPlayer player)
+        public ImageRepository(IConfiguration config, IDungeonMaster dungeonMaster, IPlayer player, AppDbContext context)
         {
             _config = config;
             _dungeonMaster = dungeonMaster;
             _player = player;
+            _context = context;
             StorageCredentials storageCreds = new StorageCredentials(_config["AzureBlobAccountName"], _config["AzureBlobKey"]);
             CloudStorageAccount = new CloudStorageAccount(storageCreds, true);
             CloudBlobClient = CloudStorageAccount.CreateCloudBlobClient();
@@ -56,11 +61,9 @@ namespace Espresso401_WebService.Models.Services
         /// <returns>Task of completion of URI string for the uploaded image</returns>
         public async Task<string> UploadImage(string imageFileName, string filePath, string userId)
         {
-            string containerName = _config["AppContainerName"];
-            CloudBlobContainer container = await GetContainerWith(containerName);
+            CloudBlobContainer container = await GetContainerWith("espresso401images");
             CloudBlockBlob blobRef = container.GetBlockBlobReference(imageFileName);
             await blobRef.UploadFromFileAsync(filePath);
-            await UpdateAppDbFor(userId, blobRef.Uri.AbsoluteUri);
             return blobRef.Uri.AbsoluteUri;
         }
 
@@ -72,18 +75,19 @@ namespace Espresso401_WebService.Models.Services
         /// <returns>Task of completion of bool representing if Update was successful</returns>
         public async Task<bool> UpdateAppDbFor(string userId, string imageURI)
         {
-            PlayerDTO userPlayer = await _player.GetPlayerByUserId(userId);
+            Player userPlayer = await _player.GetPlayerByUserIdNonDTO(userId);
             if (userPlayer != null)
             {
                 userPlayer.ImageUrl = imageURI;
-                await _player.UpdatePlayer(userPlayer);
+                _context.Entry(userPlayer).State = EntityState.Modified;
                 return true;
             }
-            DungeonMasterDTO userDungeonMaster = await _dungeonMaster.GetDungeonMasterByUserId(userId);
+
+            DungeonMaster userDungeonMaster = await _dungeonMaster.GetDungeonMasterByUserIdNonDTO(userId);
             if (userDungeonMaster != null)
             {
                 userDungeonMaster.ImageUrl = imageURI;
-                await _dungeonMaster.UpdateDungeonMaster(userDungeonMaster);
+                _context.Entry(userDungeonMaster).State = EntityState.Modified;
                 return true;
             }
             return false;

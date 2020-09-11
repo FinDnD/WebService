@@ -40,14 +40,27 @@ namespace Espresso401_WebService.Models.Services
             DungeonMaster dungeonMaster = DeconstructDTO(dungeonMasterDTO);
             _context.Entry(dungeonMaster).State = EntityState.Added;
             var result = await _context.SaveChangesAsync();
+            dungeonMasterDTO = await BuildDTO(dungeonMaster);
+            dungeonMasterDTO.ActiveRequests = new List<RequestDTO>();
+
             var players = await _context.Players.Where(x => x.PartyId == 1).ToListAsync();
             if (players != null)
             {
                 foreach (var player in players)
                 {
-                    await _request.CreateRequest(player.Id, dungeonMaster.Id);
+                    RequestDTO newReq = await _request.CreateRequest(player.Id, dungeonMaster.Id);
+                    dungeonMasterDTO.ActiveRequests.Add(newReq);
                 }
             }
+            PartyDTO newParty = new PartyDTO
+            {
+                DungeonMasterId = dungeonMasterDTO.Id,
+                MaxSize = dungeonMasterDTO.PartySize,
+                Full = false
+            };
+
+            dungeonMasterDTO.Party = await _party.CreateParty(newParty);
+
             dungeonMasterDTO.Id = dungeonMaster.Id;
             return dungeonMasterDTO;
         }
@@ -101,6 +114,17 @@ namespace Espresso401_WebService.Models.Services
                 dmDTO = await BuildDTO(dungeonMaster);
             }
             return dmDTO;
+        }      
+        
+        /// <summary>
+        /// Get a specific Dungeon Master based on the UserID associated with them
+        /// </summary>
+        /// <param name="userId">User ID associated with Dungeon Master to get</param>
+        /// <returns>Dungeon Master associated with the given userId</returns>
+        public async Task<DungeonMaster> GetDungeonMasterByUserIdNonDTO(string userId)
+        {
+            DungeonMaster dungeonMaster = await _context.DungeonMasters.Where(x => x.UserId == userId).FirstOrDefaultAsync();
+            return dungeonMaster;
         }
 
         /// <summary>
@@ -142,13 +166,16 @@ namespace Espresso401_WebService.Models.Services
             DungeonMasterDTO result = new DungeonMasterDTO
             {
                 Id = dungeonMaster.Id,
+                UserEmail = dungeonMaster.UserEmail,
                 UserId = dungeonMaster.UserId,
+                UserName = dungeonMaster.UserName,
+                ImageUrl = dungeonMaster.ImageUrl,
                 CampaignName = dungeonMaster.CampaignName,
                 CampaignDesc = dungeonMaster.CampaignDesc,
                 ExperienceLevel = dungeonMaster.ExperienceLevel.ToString(),
                 PersonalBio = dungeonMaster.PersonalBio,
                 Party = await _party.GetPartyByDMId(dungeonMaster.Id),
-                ActiveRequests = await _context.Requests.Where(x => x.DungeonMasterId == dungeonMaster.Id && x.Active && !x.DungeonMasterAccepted).ToListAsync()
+                ActiveRequests = await _request.GetAllActiveUserRequests(dungeonMaster.UserId)
             };
             return result;
         }
@@ -165,6 +192,8 @@ namespace Espresso401_WebService.Models.Services
             {
                 Id = dungeonMasterDTO.Id,
                 UserId = dungeonMasterDTO.UserId,
+                UserName = dungeonMasterDTO.UserName,
+                UserEmail = dungeonMasterDTO.UserEmail,
                 CampaignName = dungeonMasterDTO.CampaignName,
                 CampaignDesc = dungeonMasterDTO.CampaignDesc,
                 ExperienceLevel = exp,

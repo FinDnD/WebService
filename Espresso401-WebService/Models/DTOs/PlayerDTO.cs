@@ -6,6 +6,8 @@ namespace Espresso401_WebService.Models.DTOs
     {
         public int Id { get; set; }
         public string UserId { get; set; }
+        public string UserName { get; set; }
+        public string UserEmail { get; set; }
         public string ImageUrl { get; set; }
         public string CharacterName { get; set; }
         public string Class { get; set; }
@@ -15,6 +17,6 @@ namespace Espresso401_WebService.Models.DTOs
         public int LawAlignment { get; set; }
         public int? PartyId { get; set; }
         public PartyDTO Party { get; set; }
-        public List<Request> ActiveRequests { get; set; }
+        public List<RequestDTO> ActiveRequests { get; set; }
     }
 }

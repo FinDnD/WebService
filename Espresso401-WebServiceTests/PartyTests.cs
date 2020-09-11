@@ -31,9 +31,9 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 4,
@@ -44,7 +44,6 @@ namespace Espresso401_WebServiceTests
 
             Assert.NotNull(result);
             Assert.NotEqual(0, result.Id);
-            Assert.Equal(newParty.Id, result.Id);
             Assert.Equal(newParty.MaxSize, result.MaxSize);
         }
 
@@ -60,9 +59,9 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 4,
@@ -73,7 +72,7 @@ namespace Espresso401_WebServiceTests
 
             Assert.NotNull(create);
 
-            await repo.DeleteParty(create.Id);
+            await repo.DeleteParty(newDm.Id);
 
             var result = await repo.GetPartyById(create.Id);
 
@@ -108,23 +107,23 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio3"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
-            await dmRepo.CreateDungeonMaster(newDm2);
-            await dmRepo.CreateDungeonMaster(newDm3);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
+            newDm2 = await dmRepo.CreateDungeonMaster(newDm2);
+            newDm3 = await dmRepo.CreateDungeonMaster(newDm3);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 4,
                 Full = false
             };
-            Party newParty2 = new Party()
+            PartyDTO newParty2 = new PartyDTO()
             {
                 DungeonMasterId = newDm2.Id,
                 MaxSize = 133,
                 Full = false
             };
-            Party newParty3 = new Party()
+            PartyDTO newParty3 = new PartyDTO()
             {
                 DungeonMasterId = newDm3.Id,
                 MaxSize = 8,
@@ -159,9 +158,9 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 4,
@@ -189,9 +188,9 @@ namespace Espresso401_WebServiceTests
                 PersonalBio = "Test Personal Bio"
             };
             var dmRepo = BuildDmDb();
-            await dmRepo.CreateDungeonMaster(newDm);
+            newDm = await dmRepo.CreateDungeonMaster(newDm);
 
-            Party newParty = new Party()
+            PartyDTO newParty = new PartyDTO()
             {
                 DungeonMasterId = newDm.Id,
                 MaxSize = 45,
@@ -199,9 +198,9 @@ namespace Espresso401_WebServiceTests
             };
 
             var repo = BuildDb();
-            await repo.CreateParty(newParty);
+            newParty = await repo.CreateParty(newParty);
 
-            var result = await repo.GetPartyByDMId(newParty.Id);
+            var result = await repo.GetPartyByDMId(newDm.Id);
 
             Assert.NotNull(result);
             Assert.Equal(45, result.MaxSize);
@@ -212,7 +211,7 @@ namespace Espresso401_WebServiceTests
         public async Task CanUpdateParty()
         {
             var repo = BuildDb();
-            Party newPartyUpdate = new Party()
+            PartyDTO newPartyUpdate = new PartyDTO()
             {
                 Id = 1,
                 DungeonMasterId = 1,

@@ -1,6 +1,8 @@
 ﻿using Espresso401_WebService.Data;
+using Espresso401_WebService.Models.DTOs;
 using Espresso401_WebService.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -30,7 +32,7 @@ namespace Espresso401_WebService.Models.Services
         /// <param name="playerId">Player ID</param>
         /// <param name="dmId">Dungeon Master ID</param>
         /// <returns>Task of completion for request creation</returns>
-        public async Task<Request> CreateRequest(int playerId, int dmId)
+        public async Task<RequestDTO> CreateRequest(int playerId, int dmId)
         {
             Request req = new Request
             {
@@ -42,7 +44,7 @@ namespace Espresso401_WebService.Models.Services
             };
             _context.Entry(req).State = EntityState.Added;
             await _context.SaveChangesAsync();
-            return req;
+            return await BuildDTO(req);
         }
 
         /// <summary>
@@ -92,13 +94,14 @@ namespace Espresso401_WebService.Models.Services
         /// </summary>
         /// <param name="userId">User ID to be searched</param>
         /// <returns>List of Active Requests for user</returns>
-        public async Task<List<Request>> GetAllActiveUserRequests(string userId)
+        public async Task<List<RequestDTO>> GetAllActiveUserRequests(string userId)
         {
             List<Request> reqs = null;
             var userPlayer = await _context.Players.Where(x => x.UserId == userId).FirstOrDefaultAsync();
             if (userPlayer != null)
             {
                 reqs = await _context.Requests.Where(x => x.PlayerId == userPlayer.Id && x.Active && !x.PlayerAccepted)
+                                              .Include(x => x.DungeonMaster)
                                               .OrderBy(x => x.DungeonMasterAccepted)
                                               .ToListAsync();
             }
@@ -106,15 +109,16 @@ namespace Espresso401_WebService.Models.Services
             {
                 var userDm = await _context.DungeonMasters.Where(x => x.UserId == userId).FirstOrDefaultAsync();
                 reqs = await _context.Requests.Where(x => x.DungeonMasterId == userDm.Id && x.Active && !x.DungeonMasterAccepted && x.Player.PartyId == 1)
+                                              .Include(x => x.Player)
                                               .OrderBy(x => x.PlayerAccepted)
                                               .ToListAsync();
             }
+            List<RequestDTO> dtos = new List<RequestDTO>();
             foreach (Request req in reqs)
             {
-                req.Player = await _context.Players.FindAsync(req.PlayerId);
-                req.DungeonMaster = await _context.DungeonMasters.FindAsync(req.DungeonMasterId);
+                dtos.Add(await BuildDTO(req));
             }
-            return reqs;
+            return dtos;
         }
 
         /// <summary>
@@ -122,29 +126,30 @@ namespace Espresso401_WebService.Models.Services
         /// </summary>
         /// <param name="userId">User ID to be searched</param>
         /// <returns>List of all Requests for a given user (Active and Inactive)</returns>
-        public async Task<List<Request>> GetAllUserRequests(string userId)
+        public async Task<List<RequestDTO>> GetAllUserRequests(string userId)
         {
-            List<Request> requests = null;
+            List<Request> rawRequests = null;
             var userPlayer = await _context.Players.Where(x => x.UserId == userId).FirstOrDefaultAsync();
             if (userPlayer != null)
             {
-                requests = await _context.Requests.Where(x => x.PlayerId == userPlayer.Id).ToListAsync();
+                rawRequests = await _context.Requests.Where(x => x.PlayerId == userPlayer.Id).Include(x => x.DungeonMaster).ToListAsync();
             }
             else
             {
                 var userDm = await _context.DungeonMasters.Where(x => x.UserId == userId).FirstOrDefaultAsync();
                 if (userDm == null)
                 {
-                    return new List<Request>();
+                    return new List<RequestDTO>();
                 }
-                requests = await _context.Requests.Where(x => x.DungeonMasterId == userDm.Id).ToListAsync();
+
+                rawRequests = await _context.Requests.Where(x => x.DungeonMasterId == userDm.Id).Include(x => x.Player).ToListAsync();
             }
-            foreach (Request request in requests)
+            List<RequestDTO> requestDTOs = new List<RequestDTO>();
+            foreach (Request request in rawRequests)
             {
-                request.Player = await _context.Players.FindAsync(request.PlayerId);
-                request.DungeonMaster = await _context.DungeonMasters.FindAsync(request.DungeonMasterId);
+                requestDTOs.Add(await BuildDTO(request));
             }
-            return requests;
+            return requestDTOs;
         }
 
         /// <summary>
@@ -152,19 +157,43 @@ namespace Espresso401_WebService.Models.Services
         /// </summary>
         /// <param name="updatedRequest">Updated request information from swipe</param>
         /// <returns>New updated Request</returns>
-        public async Task<Request> UpdateRequest(Request updatedRequest)
+        public async Task<RequestDTO> UpdateRequest(RequestDTO updatedRequestDTO)
         {
+            Request updatedRequest = DeconstructDTO(updatedRequestDTO);
             if (updatedRequest.PlayerAccepted && updatedRequest.DungeonMasterAccepted)
             {
                 await _party.AddPlayerToParty(updatedRequest.DungeonMasterId, updatedRequest.PlayerId);
                 updatedRequest.Active = false;
+                await DeactivateAllPlayerRequests(updatedRequest.PlayerId);
             }
             _context.Entry(updatedRequest).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return updatedRequest;
+            return updatedRequestDTO;
         }
 
-        public async Task<Request> DeactivateRequest(int requestId)
+        /// <summary>
+        /// Private method for Deactivating all of a player's requests, used when they are added toa  party
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        private async Task DeactivateAllPlayerRequests(int playerId)
+        {
+            List<Request> reqs = await _context.Requests.Where(x => x.PlayerId == playerId).ToListAsync();
+            foreach (Request req in reqs)
+            {
+                req.Active = false;
+                _context.Entry(req).State = EntityState.Modified;
+                _context.Entry(req).State = EntityState.Detached;
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Set a specific Request to Inactive
+        /// </summary>
+        /// <param name="requestId">Id of the Requested to be deactivated</param>
+        /// <returns>Task of completion</returns>
+        public async Task<RequestDTO> DeactivateRequest(int requestId)
         {
             Request req = await _context.Requests.FindAsync(requestId);
             if (req != null)
@@ -173,7 +202,72 @@ namespace Espresso401_WebService.Models.Services
                 _context.Entry(req).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
-            return req;
+            return await BuildDTO(req);
+        }
+
+        /// <summary>
+        /// Build a Request DTO from a Request object
+        /// </summary>
+        /// <param name="Request">Request to be converted to DTO</param>
+        /// <returns>Request DTO</returns>
+        public async Task<RequestDTO> BuildDTO(Request request)
+        {
+            RequestDTO dto = new RequestDTO
+            {
+                Id = request.Id,
+                DungeonMasterId = request.DungeonMasterId,
+                DungeonMasterAccepted = request.DungeonMasterAccepted,
+                PlayerId = request.PlayerId,
+                PlayerAccepted = request.PlayerAccepted,
+                Active = request.Active,
+            };
+            DungeonMaster dm = await _context.DungeonMasters.FindAsync(dto.DungeonMasterId);
+            Player player = await _context.Players.FindAsync(dto.PlayerId);
+            dto.DungeonMaster = new DungeonMasterDTO
+            {
+                Id = dm.Id,
+                UserId = dm.UserId,
+                UserName = dm.UserName,
+                CampaignName = dm.CampaignName,
+                CampaignDesc = dm.CampaignDesc,
+                ExperienceLevel = dm.ExperienceLevel.ToString(),
+                PersonalBio = dm.PersonalBio,
+                ImageUrl = dm.ImageUrl
+            };
+            dto.Player = new PlayerDTO
+            {
+                Id = player.Id,
+                UserId = player.UserId,
+                UserName = player.UserName,
+                ImageUrl = player.ImageUrl,
+                CharacterName = player.CharacterName,
+                Class = player.Class.ToString(),
+                Race = player.Race.ToString(),
+                ExperienceLevel = player.ExperienceLevel.ToString(),
+                GoodAlignment = player.GoodAlignment,
+                LawAlignment = player.LawAlignment,
+                PartyId = player.PartyId
+            };
+            return dto;
+        }
+
+        /// <summary>
+        /// Deconstruct a RequestDTO into a Request object
+        /// </summary>
+        /// <param name="RequestDTO">RequestDTO to be deconstructed</param>
+        /// <returns>Request object from RequestDTO</returns>
+        public Request DeconstructDTO(RequestDTO requestDTO)
+        {
+            Request request = new Request
+            {
+                Id = requestDTO.Id,
+                DungeonMasterId = requestDTO.DungeonMasterId,
+                DungeonMasterAccepted = requestDTO.DungeonMasterAccepted,
+                PlayerId = requestDTO.PlayerId,
+                PlayerAccepted = requestDTO.PlayerAccepted,
+                Active = requestDTO.Active
+            };
+            return request;
         }
     }
 }

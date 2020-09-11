@@ -4,14 +4,16 @@ using Espresso401_WebService.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Espresso401_WebService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200908154644_AddedUserNameToPlayersAndDMs")]
+    partial class AddedUserNameToPlayersAndDMs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,9 +43,6 @@ namespace Espresso401_WebService.Migrations
                     b.Property<string>("PersonalBio")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserEmail")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
@@ -63,7 +62,7 @@ namespace Espresso401_WebService.Migrations
                             ExperienceLevel = 2,
                             ImageUrl = "https://geekandsundry.com/wp-content/uploads/2015/12/dsc.jpg",
                             PersonalBio = "I'm just a test Dungeon Master, I don't actually exist :)",
-                            UserId = "4c035675-9c5d-4763-aabe-6295555466b7"
+                            UserId = "SeededDM"
                         });
                 });
 
@@ -130,9 +129,6 @@ namespace Espresso401_WebService.Migrations
 
                     b.Property<int>("Race")
                         .HasColumnType("int");
-
-                    b.Property<string>("UserEmail")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
