@@ -15,7 +15,6 @@ Viewing and deciding on party members or dungeon masters is done with swipe card
 
 [Swagger UI](http://espresso401api.azurewebsites.net/swagger/index.html)
 
-
 ---
 
 ## ![](assets/database_icon_h25.png) Domain Model
