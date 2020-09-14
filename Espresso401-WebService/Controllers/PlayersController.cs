@@ -27,7 +27,6 @@ namespace Espresso401_WebService.Controllers
         }
 
         // GET: api/Players
-        // TODO: Admin Authorization
         [HttpGet]
         [Authorize(Policy = "AdminOnly")]
         public async Task<List<PlayerDTO>> GetPlayers()

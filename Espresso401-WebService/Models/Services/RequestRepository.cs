@@ -17,6 +17,7 @@ namespace Espresso401_WebService.Models.Services
 
         /// <summary>
         /// Constructor for the Request Repository
+        /// Uses DI for the App Db Context and Party interface to update user's party info
         /// </summary>
         /// <param name="context">AppDbContext</param>
         /// <param name="party">Party interface</param>
@@ -28,6 +29,8 @@ namespace Espresso401_WebService.Models.Services
 
         /// <summary>
         /// Create a new request in the database between a Player and Dungeon Master
+        /// This occurs whenever a Profile is created
+        /// On DM Creation a request is made with all players and vice versa
         /// </summary>
         /// <param name="playerId">Player ID</param>
         /// <param name="dmId">Dungeon Master ID</param>
@@ -49,6 +52,7 @@ namespace Espresso401_WebService.Models.Services
 
         /// <summary>
         /// Delete a specific request from the database between a Player and DM
+        /// This should not be called in the current set up but is created for potential future use
         /// </summary>
         /// <param name="playerId">Player ID</param>
         /// <param name="dmId">Dungeon Master</param>
@@ -65,8 +69,10 @@ namespace Espresso401_WebService.Models.Services
 
         /// <summary>
         /// Delete all requests for a specific User in the database
+        /// This occurs whenever a Profile is deleted
         /// </summary>
-        /// <param name="id">ID number for finding requests, can be either a Player ID OR a Dungeon Master Id</param>
+        /// <param name="id">ID number for finding requests, can be either a Player ID OR a Dungeon Master Id</param>     
+        /// <param name="profileType">Profile type to ensure correct profile is used</param>
         /// <returns>Boolean representing if Requests were deleted</returns>
         public async Task DeleteAllUserRequests(int id, string profileType)
         {
@@ -153,7 +159,7 @@ namespace Espresso401_WebService.Models.Services
         }
 
         /// <summary>
-        /// Update a specific request in the database and check if both users in request have approved or "swiped right"
+        /// Update a specific request in the database and check if both users in request have approved or "swiped right", add player to party and deactivate requests if so.
         /// </summary>
         /// <param name="updatedRequest">Updated request information from swipe</param>
         /// <returns>New updated Request</returns>
@@ -162,6 +168,7 @@ namespace Espresso401_WebService.Models.Services
             Request updatedRequest = DeconstructDTO(updatedRequestDTO);
             if (updatedRequest.PlayerAccepted && updatedRequest.DungeonMasterAccepted)
             {
+                // Add the player to the party and deactivate their requests if they both user's have accepted the request.
                 await _party.AddPlayerToParty(updatedRequest.DungeonMasterId, updatedRequest.PlayerId);
                 updatedRequest.Active = false;
                 await DeactivateAllPlayerRequests(updatedRequest.PlayerId);
@@ -172,10 +179,10 @@ namespace Espresso401_WebService.Models.Services
         }
 
         /// <summary>
-        /// Private method for Deactivating all of a player's requests, used when they are added toa  party
+        /// Private method for Deactivating all of a player's requests, used when they are added to a party
         /// </summary>
-        /// <param name="playerId"></param>
-        /// <returns></returns>
+        /// <param name="playerId">PlayerId for requests to deactivate</param>
+        /// <returns>Task of completion</returns>
         private async Task DeactivateAllPlayerRequests(int playerId)
         {
             List<Request> reqs = await _context.Requests.Where(x => x.PlayerId == playerId).ToListAsync();
@@ -209,7 +216,7 @@ namespace Espresso401_WebService.Models.Services
         /// Build a Request DTO from a Request object
         /// </summary>
         /// <param name="Request">Request to be converted to DTO</param>
-        /// <returns>Request DTO</returns>
+        /// <returns>Task of completion of Request DTO</returns>
         public async Task<RequestDTO> BuildDTO(Request request)
         {
             RequestDTO dto = new RequestDTO
