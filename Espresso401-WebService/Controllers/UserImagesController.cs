@@ -24,6 +24,11 @@ namespace Espresso401_WebService.Controllers
             _image = image;
         }
 
+        /// <summary>
+        /// Route for uploading user images upon character creation. Takes in an image in the form of a MultiPartFormDataContent on the front end.
+        /// </summary>
+        /// <param name="file">Image file to be uploaded</param>
+        /// <returns>Task of completion with string of image URL</returns>
         [HttpPost]
         public async Task<string> UploadUserImage(IFormFile file)
         {
