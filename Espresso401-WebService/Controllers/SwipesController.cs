@@ -22,6 +22,12 @@ namespace Espresso401_WebService.Controllers
         }
 
         // PUT api/Swipes/5
+        /// <summary>
+        /// Handles the swiping mechanic on the front end. Request will have an updated boolean value representing the swipe that occured.
+        /// </summary>
+        /// <param name="id">Id of the Request</param>
+        /// <param name="request">Updated request</param>
+        /// <returns>Task of completion, 400 Bad Request if the IDs don't line up and 204 NoContent if it goes through.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, RequestDTO request)
         {
