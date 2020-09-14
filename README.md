@@ -11,7 +11,9 @@ Viewing and deciding on party members or dungeon masters is done with swipe card
 
 [Database ERD & Table Descriptions](app-info/database-erd.md)
 
-[Swagger](http://espresso401api.azurewebsites.net/swagger)
+[Application Screenshots](app-info/screenshots.md)
+
+[Swagger UI](http://espresso401api.azurewebsites.net/swagger/index.html)
 
 ---
 
